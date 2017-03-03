@@ -1,4 +1,4 @@
-//This is not encoded properly; copy and paste this 
+//This is not encoded properly; copy and paste this
 //into the actual application when finished.
 
 
@@ -29,10 +29,10 @@ public class Server extends JFrame {
 				public void actionPerformed(ActionEvent event){
 					sendMessage(event.getActionCommand());
 					userText.setText("");
-					
+
 				}
 			}
-		
+
 		);
 		add(userText, BorderLayout.NORTH);
 		chatWindow = new JTextArea();
@@ -40,20 +40,20 @@ public class Server extends JFrame {
 		setSize(300, 150);
 		setVisible (true);
 	}
-	
+
 	//setting up and running the server
 	public void startRunning(){
 		try{
 			//port number is 6789, remember to open up the port in your router later
 			//backlog of 100 --> how many clients(?) can access the port
-			server = new ServerSocket(6789, 100); 
-			
+			server = new ServerSocket(6789, 100);
+
 			while (true){
 				try{
 					waitForConnection();
 					setupStreams();
 					whileChatting();
-					
+
 				}catch (EOFException eofException){
 					showMessage ("\n Server onnection ended.");
 				}finally{
@@ -64,23 +64,23 @@ public class Server extends JFrame {
 			ioException.printStackTrace();
 		}
 	}
-	
+
 	//waiting for connection
-	private void waitForConnection(){
+	private void waitForConnection() throws IOException{
 		showMessage("Waiting for someone to connect...\n");
 		connection = server.accept();
 		showMessage("Connection establisheddddddd dawg. Connected to " +connection.getInetAddress().getHostName() +"\n");
 	}
-	
+
 	//get stream to send and receive data
 	private void setupStreams() throws IOException{
 		output = new ObjectOutputStream(connection.getOutputStream());
 		output.flush();
 		input = new ObjectInputStream(connection.getInputStream());
 		showMessage("Streams are now up \n");
-		
+
 	}
-	
+
 	private void whileChatting() throws IOException{
 		String msg = "You are now connected! ";
 		sendMessage(msg);
@@ -92,9 +92,9 @@ public class Server extends JFrame {
 			}catch (ClassNotFoundException classNotFoundException){
 				showMessage("\n something went wrong lol");
 			}
-		}while(!message.equals("CLIENT - END"));
+		}while(!msg.equals("CLIENT - END"));
 	}
-	
+
 	//Closing and emptying the streams and connection.
 	//Housekeeping
 	private void closeStream(){
@@ -108,7 +108,7 @@ public class Server extends JFrame {
 			ioException.printStackTrace();
 		}
 	}
-	
+
 	//Sending the messages
 	private void sendMessage(String message){
 		try{
@@ -119,38 +119,27 @@ public class Server extends JFrame {
 			chatWindow.append("\nCANNOT SEND MESSAGE");
 		}
 	}
-	
+
 	//chatWindow update
 	private void showMessage(final String text){
-		
+		SwingUtilities.invokeLater(
+			new Runnable(){
+				public void run(){
+					chatWindow.append(text);
+				}
+			}
+		);
 	}
-	
-	
+
+	//let the user type into the chatbox
+	private void ableToType(final boolean tof){
+		SwingUtilities.invokeLater(
+			new Runnable(){
+				public void run(){
+					userText.setEditable(tof);
+				}
+			}
+		);
+	}
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
